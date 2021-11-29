@@ -1,6 +1,6 @@
 #include "get_next_line.h"
 
-size_t	ft_strlen(char *s)
+size_t	ft_strlen(const char *s)
 {
 	size_t	i;
 

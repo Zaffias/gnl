@@ -1,25 +1,20 @@
 #include "get_next_line.h"
 #include <stdio.h>
 #include <string.h>
-char	*line_read(char *raw_line, char **rem)
+static size_t	line_read(char *raw_line)
 {
 	size_t	i;
-	char	*res;
-	size_t	len;
 
-	len = ft_strlen(raw_line);
 	i = 0;
-	while(raw_line[i] != '\n')
+	while(raw_line[i] != '\n' && raw_line[i])
 		i++;
-	res = ft_substr(raw_line, 0, i + 1);
-	*rem = ft_substr(raw_line, i, (len - i) - 3);
-	return(res);
+	return(i);
 }
 char	*get_next_line(int fd)
 {
 	ssize_t		bytes_rd;
 	char		buffer[BUFFER_SIZE + 1];
-	static char	**rem;
+	static char	*rem[65535];
 	char		*aux;
 	char		*res;
 
@@ -28,21 +23,32 @@ char	*get_next_line(int fd)
 	{
 		bytes_rd = read(fd , buffer, BUFFER_SIZE);
 		buffer[BUFFER_SIZE] = 0;
-		if(!*rem)
-			*rem = ft_strdup("");
-		aux = ft_strjoin(*rem, buffer);
-		if (ft_strchr(aux,'\n'))
+		if(!rem[fd])
+			rem[fd] = ft_strdup("");
+		aux = ft_strjoin(rem[fd], buffer);
+		free(rem[fd]);
+		rem[fd] = aux;
+		if (ft_strchr(rem[fd],'\n'))
 			break;
 	}
-	res = line_read(aux, rem);
-	printf("Primer salto de línea: %s\nResto del buffer%s", res, *rem);
+	res = ft_substr(rem[fd], 0, line_read(rem[fd]) + 1);
+	rem[fd] = ft_substr(rem[fd], line_read(rem[fd]) + 1, BUFFER_SIZE - line_read(rem[fd]));
+	printf("Resultado: %s",res);
+	//printf("Restante: %s",rem[fd]);
+	return(res);
 }
 int main()
 {
 	int fd = open("b",O_RDONLY);
-	
-	get_next_line(fd);
+	int i = 0;
+	while(i < 11)
+	{
+		get_next_line(fd);
+		i++;
+	}
+
 }
+
 /* Read recuerda la posición del archivo en la que estaba en cada llamada, por lo que
 puedo leer, después comprobar si en el buffer está \n, si es así devolver hasta ahí y guardar
 el restante de lo leído (si lo hay) a rem (¿Qué pasa si leo todo de golpe?); si no es así  guardo buff en un auxiliar en el heap,
