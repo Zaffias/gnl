@@ -1,52 +1,74 @@
 #include "get_next_line.h"
 #include <stdio.h>
 #include <string.h>
-static size_t	line_read(char *raw_line)
+size_t	linelen(char *s)
 {
 	size_t	i;
 
 	i = 0;
-	while(raw_line[i] != '\n' && raw_line[i])
+	while(s[i] != '\n' && s[i])
 		i++;
 	return(i);
 }
+char	*extract_line(char *rem)
+{
+	char	*line;
+	size_t	i;
+
+	i = linelen(rem);
+	line = ft_substr(rem, 0, i + 1);
+	return(line);
+}
+char	*extract_rem(char *rem)
+{
+	char	*line;
+	size_t	i;
+
+	i = linelen(rem);
+	line = ft_substr(rem, i + 1, ft_strlen(rem) - i);
+	free(rem);
+	return (line);
+}
+char	*alloc_line(int fd, char *rem)	
+{
+	char	*buffer;
+	int		r_bytes;
+
+	buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if(!buffer)
+		return (NULL);
+	r_bytes = 1;
+	if(!rem)
+		rem = ft_strdup("");
+	while(!ft_strchr(rem,'\n') && r_bytes)
+	{
+		r_bytes = read(fd, buffer, BUFFER_SIZE);
+		if (r_bytes == -1)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[r_bytes] = 0;
+		rem = ft_strjoin(rem, buffer);
+	}
+	free(buffer);
+	return (rem);
+}
+
 char	*get_next_line(int fd)
 {
-	ssize_t		bytes_rd;
-	char		buffer[BUFFER_SIZE + 1];
-	static char	*rem[65535];
-	char		*aux;
-	char		*res;
+	char		*line;
+	static char	*rem;
 
-	bytes_rd = 1;
-	while(bytes_rd > 0)
-	{
-		bytes_rd = read(fd , buffer, BUFFER_SIZE);
-		buffer[BUFFER_SIZE] = 0;
-		if(!rem[fd])
-			rem[fd] = ft_strdup("");
-		aux = ft_strjoin(rem[fd], buffer);
-		free(rem[fd]);
-		rem[fd] = aux;
-		if (ft_strchr(rem[fd],'\n'))
-			break;
-	}
-	res = ft_substr(rem[fd], 0, line_read(rem[fd]) + 1);
-	rem[fd] = ft_substr(rem[fd], line_read(rem[fd]) + 1, BUFFER_SIZE - line_read(rem[fd]));
-	printf("Resultado: %s",res);
-	//printf("Restante: %s",rem[fd]);
-	return(res);
-}
-int main()
-{
-	int fd = open("b",O_RDONLY);
-	int i = 0;
-	while(i < 11)
-	{
-		get_next_line(fd);
-		i++;
-	}
-
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return(NULL);
+	rem = alloc_line(fd, rem);
+	if(!rem)
+		return (NULL);
+	line = extract_line(rem);
+	rem = extract_rem(rem);
+	printf("%s",line);
+	return(line);
 }
 
 /* Read recuerda la posición del archivo en la que estaba en cada llamada, por lo que

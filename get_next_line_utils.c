@@ -29,12 +29,17 @@ char	*ft_strdup(const char *s1)
 	return (res - length);
 }
 
-char	*ft_strjoin(const char *s1, const char *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*p;
 	int		total;
 	int		i;
 
+	if(!s1)
+	{
+		s1 = malloc(sizeof(char));
+		s1[0] = 0;
+	}
 	total = (ft_strlen(s1) + ft_strlen(s2));
 	p = malloc(sizeof(char) * (total + 1));
 	if (!p)
@@ -58,22 +63,20 @@ char	*ft_strjoin(const char *s1, const char *s2)
 }
 
 
-size_t		ft_strchr(const char *s, int c)
+char	*ft_strchr(const char *s, int c)
 {
 	char	*r;
-	size_t	res;
 
-	res = 0;
 	r = (char *)s;
-	while (r[res])
+	while (*r)
 	{
-		if (r[res] == (unsigned char)c)
-			return (res);
-		res++;
+		if (*r == (unsigned char)c)
+			return (r);
+		r++;
 	}
 	if (!*r && !c)
-		return (0);
-	return (0);
+		return (r);
+	return (NULL);
 }
 
 char	*ft_substr(char const *s, unsigned int start, size_t len)
