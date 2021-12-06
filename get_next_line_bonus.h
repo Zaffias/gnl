@@ -6,12 +6,12 @@
 /*   By: rpereda- <rpereda-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 16:39:41 by rpereda-          #+#    #+#             */
-/*   Updated: 2021/12/06 16:39:50 by rpereda-         ###   ########.fr       */
+/*   Updated: 2021/12/06 17:19:04 by rpereda-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 
 # include <stdlib.h>
 # include <unistd.h>

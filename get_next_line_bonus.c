@@ -6,7 +6,7 @@
 /*   By: rpereda- <rpereda-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/06 16:10:14 by rpereda-          #+#    #+#             */
-/*   Updated: 2021/12/06 16:33:22 by rpereda-         ###   ########.fr       */
+/*   Updated: 2021/12/06 18:17:05 by rpereda-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ char	*extract_rem(char **rem, int fd)
 	i = linelen(rem[fd]);
 	line = ft_substr(rem[fd], i + 1, ft_strlen(rem[fd]) - i);
 	free(rem[fd]);
-	rem[fd] = NULL;
 	return (line);
 }
 
@@ -80,7 +79,7 @@ char	*alloc_line(int fd, char **rem)
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*rem[5000];
+	static char	*rem[65536];
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
@@ -96,10 +95,5 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	rem[fd] = extract_rem(rem, fd);
-	if (!*rem)
-	{
-		free(rem[fd]);
-		rem[fd] = NULL;
-	}
 	return (line);
 }
